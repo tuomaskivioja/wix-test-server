@@ -22,11 +22,11 @@ client.orders.onOrderCreated((event) => {
   //
 });
 
-app.post("/webhook", express.text(), async (request, response) => {
+app.post("/webhook", async (request, response) => {
   try {
     console.log(request);
 
-    const decoded = jwt.decode(request.body, { complete: true });
+    const decoded = jwt.decode(request.body);
     console.log("Decoded JWT:", decoded);
 
   } catch (err) {
