@@ -31,4 +31,10 @@ app.post("/webhook", express.text(), async (request, response) => {
   response.status(200).send();
 });
 
+app.post("/test", express.text(), async (request, response) => {
+  console.log("test");
+
+  response.status(200).send();
+});
+
 app.listen(3000, () => console.log("Server started on port 3000"));
