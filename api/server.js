@@ -20,8 +20,9 @@ client.orders.onOrderCreated((event) => {
   //
 });
 
-app.post("/webhook", express.text(), async (request, response) => {
+app.post("/webhook", async (request, response) => {
   try {
+    console.log("webhook", request.body);
     await client.webhooks.process(request.body);
   } catch (err) {
     console.error(err);
