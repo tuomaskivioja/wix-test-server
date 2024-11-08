@@ -4,11 +4,7 @@ import { OAuthStrategy, createClient } from "@wix/sdk";
 import { orders } from "@wix/pricing-plans";
 const app = express();
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors());
 
 const client = createClient({
     auth: OAuthStrategy({
@@ -38,7 +34,7 @@ app.post("/webhook", express.text(), async (request, response) => {
   response.status(200).send();
 });
 
-app.post("/test", express.text(), async (request, response) => {
+app.post("/api/test", async (request, response) => {
   console.log("test");
 
   response.status(200).send();
