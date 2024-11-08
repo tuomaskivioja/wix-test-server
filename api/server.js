@@ -1,7 +1,14 @@
 import express from "express";
+import cors from "cors";
 import { OAuthStrategy, createClient } from "@wix/sdk";
 import { orders } from "@wix/pricing-plans";
 const app = express();
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 
 const client = createClient({
     auth: OAuthStrategy({
