@@ -1,35 +1,52 @@
 import express from "express";
 import cors from "cors";
-import { OAuthStrategy, createClient } from "@wix/sdk";
-import { orders } from "@wix/pricing-plans";
-import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const client = createClient({
-    auth: OAuthStrategy({
-        clientId: `52e4ff0a-299a-4fe1-94b3-ec9212364b7d`,
-      }),
-  modules: { orders },
-});
+const subscriptionsFilePath = path.join(__dirname, "subscriptions.json");
 
-client.orders.onOrderCreated((event) => {
-  console.log(`onOrderCreated event received with data:`, event);
-  //
-  // Handle your event here
-  //
-});
+// Helper function to read subscriptions from the JSON file
+function readSubscriptions() {
+  try {
+    const data = fs.readFileSync(subscriptionsFilePath, "utf8");
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Error reading subscriptions file:", err);
+    return [];
+  }
+}
 
-app.post("/webhook", async (request, response) => {
+// Helper function to write subscriptions to the JSON file
+function writeSubscriptions(subscriptions) {
+  try {
+    fs.writeFileSync(subscriptionsFilePath, JSON.stringify(subscriptions, null, 2));
+  } catch (err) {
+    console.error("Error writing to subscriptions file:", err);
+  }
+}
+
+app.post("/webhook", (request, response) => {
   try {
     console.log("Request Headers:", request.headers);
-    console.log(request.body);
+    console.log("Request Body:", request.body);
 
-    const decoded = jwt.decode(request.body);
-    console.log("Decoded JWT:", decoded);
+    const { contact_id, plan_order_id } = request.body.data;
+
+    // Read existing subscriptions
+    const subscriptions = readSubscriptions();
+
+    // Add new subscription
+    subscriptions.push({ contact_id, plan_order_id, timestamp: new Date().toISOString() });
+
+    // Write updated subscriptions back to the file
+    writeSubscriptions(subscriptions);
+
+    console.log("Subscription saved:", { contact_id, plan_order_id });
 
   } catch (err) {
     console.error(err);
@@ -42,7 +59,7 @@ app.post("/webhook", async (request, response) => {
   response.status(200).send();
 });
 
-app.get("/api/test", async (request, response) => {
+app.get("/api/test", (request, response) => {
   console.log("test");
 
   response.status(200).send();
