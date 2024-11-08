@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import { OAuthStrategy, createClient } from "@wix/sdk";
 import { orders } from "@wix/pricing-plans";
+import jwt from "jsonwebtoken";
+
 const app = express();
 
 app.use(cors());
@@ -20,10 +22,13 @@ client.orders.onOrderCreated((event) => {
   //
 });
 
-app.post("/webhook", async (request, response) => {
+app.post("/webhook", express.text(), async (request, response) => {
   try {
-    console.log("webhook", request.body);
-    await client.webhooks.process(request.body);
+    console.log("webhook");
+
+    const decoded = jwt.decode(request.body, { complete: true });
+    console.log("Decoded JWT:", decoded);
+
   } catch (err) {
     console.error(err);
     response
