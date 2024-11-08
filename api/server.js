@@ -34,7 +34,7 @@ app.post("/webhook", express.text(), async (request, response) => {
   response.status(200).send();
 });
 
-app.post("/api/test", async (request, response) => {
+app.get("/api/test", async (request, response) => {
   console.log("test");
 
   response.status(200).send();
